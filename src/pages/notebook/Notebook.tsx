@@ -5,9 +5,13 @@ import { Note } from "../../types/Note";
 import "./Notebook.css";
 import { useQuery } from "react-query";
 import { useMutation, useQueryClient } from 'react-query';
-import api from '../services/api';
+import api from '../../services/api';
+import React, { useState } from 'react';
 
 export default function Notebook() {
+  const [newNote, setNewNote] = useState({ title: '', description: '' });
+  const queryClient = useQueryClient();
+
   const {
     data: notes,
     isFetching,
@@ -21,7 +25,23 @@ export default function Notebook() {
     return response.json();
   });
 
-  const queryClient = useQueryClient();
+  const addNoteMutation = useMutation(async (newNoteData) => {
+    const response = await api.post('notes', newNoteData);
+    if (response.status === 201) {
+      return response.data;
+    }
+    throw new Error('Failed to add a new note');
+  }, {
+    onSuccess: () => {
+      queryClient.invalidateQueries('notes'); 
+      setNewNote({ title: '', description: '' });
+    },
+  });
+
+  const handleAddNote = () => {
+    addNoteMutation.mutate(newNote);
+  };
+
   const deleteTodo = useMutation({
     mutationFn: async (todo: { id: number }) => {
        const response =  await fetch(`http://localhost:5000/notes/${todo.id}`, { method: "DELETE" })
@@ -50,6 +70,9 @@ const handleDeleteNote = (id: number) => {
     <div>
       <h1>Bloco de notas</h1>
       <div className="notebook">
+        
+
+        {/* List of existing notes */}
         {notes.map((note: Note) => (
           <NoteCard
             key={note.id}
@@ -59,6 +82,25 @@ const handleDeleteNote = (id: number) => {
             handleEdit={handleEditNote}
           />
         ))}
+
+        {/* Form to add a new note */}
+        <div className="add-note-form" >
+          <input
+            type="text"
+            placeholder="Title"
+            value={newNote.title}
+            onChange={(e) => setNewNote({ ...newNote, title: e.target.value })}
+          />
+          <input
+            type="text"
+            placeholder="Description"
+            value={newNote.description}
+            onChange={(e) =>
+              setNewNote({ ...newNote, description: e.target.value })
+            }
+          />
+          <button onClick={handleAddNote}>Add Note</button>
+        </div>
       </div>
     </div>
   );
