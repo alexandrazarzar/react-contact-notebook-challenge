@@ -4,6 +4,8 @@ import NoteCard from "../../components/NoteCard/NoteCard";
 import { Note } from "../../types/Note";
 import "./Notebook.css";
 import { useQuery } from "react-query";
+import { useMutation, useQueryClient } from 'react-query';
+import api from '../services/api';
 
 export default function Notebook() {
   const {
@@ -19,9 +21,18 @@ export default function Notebook() {
     return response.json();
   });
 
-  const handleDeleteNote = () => {
-    // Lógica para deleção aqui
-  };
+  const queryClient = useQueryClient();
+  const deleteTodo = useMutation({
+    mutationFn: async (todo: { id: number }) => {
+       const response =  await fetch(`http://localhost:5000/notes/${todo.id}`, { method: "DELETE" })
+       if(!response.ok) { throw new Error("Erro ao remover") }
+   },
+   onSuccess: () => queryClient.invalidateQueries('notes')
+})
+
+const handleDeleteNote = (id: number) => {
+  deleteTodo.mutate({ id })
+};
 
   const handleEditNote = () => {
     // Lógica para edição aqui
@@ -44,7 +55,7 @@ export default function Notebook() {
             key={note.id}
             title={note.title}
             description={note.description}
-            handleDelete={handleDeleteNote}
+            handleDelete={() => handleDeleteNote(note.id)}
             handleEdit={handleEditNote}
           />
         ))}
