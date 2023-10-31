@@ -3,7 +3,8 @@ import ContactCard from "../../components/ContactCard/ContactCard";
 import Loading from "../../components/Loading/Loading";
 import { Contact } from "../../types/Contact";
 import "./Contacts.css";
-import { useQuery } from "react-query";
+import { useQuery, useMutation, useQueryClient } from "react-query";
+import api from '../services/api';
 
 export default function Contacts() {
   const {
@@ -19,9 +20,19 @@ export default function Contacts() {
     return response.json();
   });
 
-  const handleDeleteContact = () => {
-    // Lógica para deleção aqui
-  };
+  const queryClient = useQueryClient();
+
+  const deleteContact = useMutation({
+    mutationFn: async (contact: { id: number }) => {
+       const response =  await fetch(`http://localhost:5000/contacts/${contact.id}`, { method: "DELETE" })
+       if(!response.ok) { throw new Error("Erro ao remover") }
+   },
+   onSuccess: () => queryClient.invalidateQueries('contacts')
+})
+
+const handleDeleteContact = (id: number) => {
+  deleteContact.mutate({ id })
+};
 
   const handleEditContact = () => {
     // Lógica para edição aqui
@@ -45,7 +56,7 @@ export default function Contacts() {
             name={contact.name}
             email={contact.email}
             phone={contact.phone}
-            handleDelete={handleDeleteContact}
+            handleDelete={() => handleDeleteContact(contact.id)}
             handleEdit={handleEditContact}
           />
         ))}
