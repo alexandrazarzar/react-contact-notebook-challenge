@@ -23,8 +23,13 @@ export default function NoteCard({
   const [description, setDescription] = useState(initialDescription);
 
   const handleSave = () => {
+    if (title.trim() !== "" && description.trim() !== ""){
     updateNoteMutation.mutate({ id, title, description });
     setIsEditing(false);
+    } else {
+      window.alert("⚠️ Insira uma nota válida");
+        return;
+    }
   };
 
   return (
