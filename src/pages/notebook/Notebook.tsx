@@ -10,6 +10,7 @@ import React, { useState } from 'react';
 
 export default function Notebook() {
   const [newNote, setNewNote] = useState({ title: '', description: '' });
+  const [editingNote, setEditingNote] = useState(false);
   const queryClient = useQueryClient();
 
   const {
@@ -55,7 +56,11 @@ const handleDeleteNote = (id: number) => {
 };
 
   const handleEditNote = () => {
-    // Lógica para edição aqui
+    setEditingNote(true);
+  };
+
+  const handleSaveNote = () => {
+    setEditingNote(false);
   };
 
   if (isFetching) {
@@ -78,8 +83,10 @@ const handleDeleteNote = (id: number) => {
             key={note.id}
             title={note.title}
             description={note.description}
+            isEditing={editingNote}
             handleDelete={() => handleDeleteNote(note.id)}
             handleEdit={handleEditNote}
+            handleSave={handleSaveNote}
           />
         ))}
 
