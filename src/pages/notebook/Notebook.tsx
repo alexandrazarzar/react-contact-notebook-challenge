@@ -54,9 +54,35 @@ const handleDeleteNote = (id: number) => {
   deleteTodo.mutate({ id })
 };
 
-  const handleEditNote = () => {
-    // Lógica para edição aqui
-  };
+const updateNoteMutation = useMutation(
+  async (note: { id: number, title: string, description: string }) => {
+    const response = await api.put(`notes/${note.id}`, {title: note.title, description: note.description });
+    if (response.status === 200) {
+      return response.data;
+    }
+    throw new Error('Failed to update the note');
+  },
+  {
+    onSuccess: () => {
+      queryClient.invalidateQueries('notes');
+    },
+  }
+);
+
+const handleEditNote = (id: number, updatedTitle: string, updatedDescription: string) => {
+  const updatedNotes = notes.map((note: Note) => {
+    if (note.id === id) {
+      return {
+        ...note,
+        title: updatedTitle,
+        description: updatedDescription,
+      };
+    }
+    return note;
+  });
+
+  queryClient.setQueryData('notes', updatedNotes);
+};
 
   if (isFetching) {
     return <Loading />;
@@ -75,11 +101,12 @@ const handleDeleteNote = (id: number) => {
         {/* List of existing notes */}
         {notes.map((note: Note) => (
           <NoteCard
-            key={note.id}
+            id={note.id}
             title={note.title}
             description={note.description}
             handleDelete={() => handleDeleteNote(note.id)}
-            handleEdit={handleEditNote}
+            handleEdit={() => handleEditNote(note.id, note.title, note.description)}
+            updateNoteMutation={updateNoteMutation}
           />
         ))}
 
