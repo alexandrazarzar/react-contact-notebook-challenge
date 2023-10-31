@@ -55,6 +55,21 @@ const handleDeleteContact = (id: number) => {
   deleteContact.mutate({ id })
 };
 
+const updateContactMutation = useMutation(
+  async (contact: { id: number, name: string, email: string, phone: string}) => {
+    const response = await api.put(`contacts/${contact.id}`, { name: contact.name, email: contact.email, phone: contact.phone});
+    if (response.status === 200) {
+      return response.data;
+    }
+    throw new Error('Failed to update the contact');
+  },
+  {
+    onSuccess: () => {
+      queryClient.invalidateQueries('contacts');
+    },
+  }
+);
+
   const handleEditContact = () => {
     // Lógica para edição aqui
   };
@@ -73,12 +88,12 @@ const handleDeleteContact = (id: number) => {
       <div className="contacts">
         {contacts.map((contact: Contact) => (
           <ContactCard
-            key={contact.id}
+            id={contact.id}
             name={contact.name}
             email={contact.email}
             phone={contact.phone}
             handleDelete={() => handleDeleteContact(contact.id)}
-            handleEdit={handleEditContact}
+            updateContactMutation={updateContactMutation}
           />
         ))}
         {/* Form to add a new contact */}
