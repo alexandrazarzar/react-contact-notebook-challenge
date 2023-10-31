@@ -40,7 +40,12 @@ export default function Contacts() {
   });
 
   const handleAddContact = () => {
+    if (newContact.name.trim() !== "" && newContact.email.trim() !== "" && newContact.phone.trim() !== "") {
     addContactMutation.mutate(newContact);
+    } else {
+      window.alert("⚠️ Insira um contato válida");
+      return;
+    }
   };
 
   const deleteContact = useMutation({
