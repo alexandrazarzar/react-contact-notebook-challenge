@@ -39,7 +39,12 @@ export default function Notebook() {
   });
 
   const handleAddNote = () => {
-    addNoteMutation.mutate(newNote);
+    if (newNote.title.trim() !== "" && newNote.description.trim() !== "") {
+      addNoteMutation.mutate(newNote);
+    } else {
+        window.alert("⚠️ Insira uma nota válida");
+        return;
+    }
   };
 
   const deleteTodo = useMutation({
@@ -111,22 +116,24 @@ const handleEditNote = (id: number, updatedTitle: string, updatedDescription: st
         ))}
 
         {/* Form to add a new note */}
-        <div className="add-note-form" >
-          <input
-            type="text"
-            placeholder="Title"
-            value={newNote.title}
-            onChange={(e) => setNewNote({ ...newNote, title: e.target.value })}
-          />
-          <input
-            type="text"
-            placeholder="Description"
-            value={newNote.description}
-            onChange={(e) =>
-              setNewNote({ ...newNote, description: e.target.value })
-            }
-          />
-          <button onClick={handleAddNote}>Add Note</button>
+        <div className="card">
+          <div>
+            <input
+              type="text"
+              placeholder="Título"
+              value={newNote.title}
+              onChange={(e) => setNewNote({ ...newNote, title: e.target.value })}
+            />
+          </div>
+          <div>
+            <input
+              type="text"
+              placeholder="Descrição"
+              value={newNote.description}
+              onChange={(e) => setNewNote({ ...newNote, description: e.target.value })}
+            />
+          </div>
+          <button onClick={handleAddNote}>Criar nota</button>
         </div>
       </div>
     </div>
