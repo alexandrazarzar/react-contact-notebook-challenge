@@ -3,3 +3,8 @@
     grid-template-columns: repeat(2, 50%);
     gap: 16px;
 }
+
+.left-aligned {
+    text-align: left;
+  }
+  

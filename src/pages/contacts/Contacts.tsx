@@ -4,9 +4,13 @@ import Loading from "../../components/Loading/Loading";
 import { Contact } from "../../types/Contact";
 import "./Contacts.css";
 import { useQuery, useMutation, useQueryClient } from "react-query";
-import api from '../services/api';
+import api from '../../services/api';
+import React, { useState } from 'react';
+
 
 export default function Contacts() {
+  const [newContact, setNewContact] = useState({ name: '', email: '', phone: ''});
+
   const {
     data: contacts,
     isFetching,
@@ -21,6 +25,23 @@ export default function Contacts() {
   });
 
   const queryClient = useQueryClient();
+
+  const addContactMutation = useMutation(async (newContactData) => {
+    const response = await api.post('contacts', newContactData);
+    if (response.status === 201) {
+      return response.data;
+    }
+    throw new Error('Failed to add a new contact');
+  }, {
+    onSuccess: () => {
+      queryClient.invalidateQueries('contacts'); 
+      setNewContact({ name: '', email: '', phone: ''});
+    },
+  });
+
+  const handleAddContact = () => {
+    addContactMutation.mutate(newContact);
+  };
 
   const deleteContact = useMutation({
     mutationFn: async (contact: { id: number }) => {
@@ -60,7 +81,38 @@ const handleDeleteContact = (id: number) => {
             handleEdit={handleEditContact}
           />
         ))}
+        {/* Form to add a new contact */}
+        <div className="card">
+          <div>
+            <h3 className="left-aligned">{'Nome'}</h3>
+            <input
+              type="text"
+              placeholder="Nome"
+              value={newContact.name}
+              onChange={(e) => setNewContact({ ...newContact, name: e.target.value })}
+            />
+          </div>
+          <div>
+            <h3 className="left-aligned">{'Telefone'}</h3>
+            <input
+              type="text"
+              placeholder="Telefone"
+              value={newContact.phone}
+              onChange={(e) => setNewContact({ ...newContact, phone: e.target.value })}
+            />
+          </div>
+          <div>
+            <h3 className="left-aligned">{'E-mail'}</h3>
+            <input
+              type="text"
+              placeholder="E-mail"
+              value={newContact.email}
+              onChange={(e) => setNewContact({ ...newContact, email: e.target.value })}
+            />
+          </div>
+          <button onClick={handleAddContact}>Criar Contato</button>
+        </div>
       </div>
     </div>
   );
-}
+}  
