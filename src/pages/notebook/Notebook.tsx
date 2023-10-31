@@ -74,21 +74,6 @@ const updateNoteMutation = useMutation(
   }
 );
 
-const handleEditNote = (id: number, updatedTitle: string, updatedDescription: string) => {
-  const updatedNotes = notes.map((note: Note) => {
-    if (note.id === id) {
-      return {
-        ...note,
-        title: updatedTitle,
-        description: updatedDescription,
-      };
-    }
-    return note;
-  });
-
-  queryClient.setQueryData('notes', updatedNotes);
-};
-
   if (isFetching) {
     return <Loading />;
   }
@@ -110,7 +95,6 @@ const handleEditNote = (id: number, updatedTitle: string, updatedDescription: st
             title={note.title}
             description={note.description}
             handleDelete={() => handleDeleteNote(note.id)}
-            handleEdit={() => handleEditNote(note.id, note.title, note.description)}
             updateNoteMutation={updateNoteMutation}
           />
         ))}

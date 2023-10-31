@@ -6,7 +6,6 @@ type NoteCardInput = {
   title: string;
   description: string;
   handleDelete: () => void;
-  handleEdit: () => void;
   updateNoteMutation: any;
 };
 
@@ -15,7 +14,6 @@ export default function NoteCard({
   title: initialTitle,
   description: initialDescription,
   handleDelete,
-  handleEdit,
   updateNoteMutation,
 }: NoteCardInput) {
   const [isEditing, setIsEditing] = useState(false);
