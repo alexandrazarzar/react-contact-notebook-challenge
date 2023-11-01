@@ -33,7 +33,7 @@ export default function ContactCard({
     updateContactMutation.mutate({ id, name, email, phone });
     setIsEditing(false);
     } else {
-      window.alert("⚠️ Insira um contato válida");
+      window.alert("⚠️ Insira um contato válido");
         return;
     }
   };
